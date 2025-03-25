@@ -1,0 +1,7 @@
+(library
+ (name po_menhir)
+ (libraries nice_parser))
+
+(ocamllex (modules lexer))
+
+(menhir (modules parser))

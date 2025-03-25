@@ -1,0 +1,4 @@
+(executable
+ (public_name po_menhir)
+ (name main)
+ (libraries po_menhir))
