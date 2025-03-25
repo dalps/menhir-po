@@ -1,4 +1,4 @@
 open Po_menhir
 open Po_menhir_test
-open Test_po_menhir
+open Test_parser
 open Driver
