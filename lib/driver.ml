@@ -11,12 +11,13 @@ end)
 
 let show_token (t : token) =
   match t with
-  | Parser.TEXT t -> "TEXT " ^ t
-  | Parser.QUOTE -> "QUOTE (\")"
+  | Parser.STRING t -> "STRING " ^ t
   | Parser.MSGSTR -> "msgstr"
   | Parser.MSGID -> "msgid"
+  | Parser.MSGCTXT -> "msgctxt"
+  | Parser.MSGID_PLURAL -> "msgid_plural"
   | Parser.EOF -> "eof"
-  | Parser.COMMENT c -> "COMMENT " ^ c
+  | _ -> "other token"
 
 let () =
   pp_exceptions ();

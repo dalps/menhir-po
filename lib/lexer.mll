@@ -26,19 +26,18 @@ rule next_token =
   | "msgstr"        { MSGSTR }
   | "msgctxt"       { MSGCTXT }
   | "msgid_plural"  { MSGID_PLURAL }
-  | "msgstr_plural" { MSGSTR_PLURAL }
   | '['             { LBRACKET }
   | ']'             { RBRACKET }
   | ','             { COMMA }
-  | '#'             { TRANSLATOR_COMMENT }
-  | "#."            { EXTRACTED_COMMENT }
-  | "#:"            { REFERENCES }
-  | "#,"            { FLAGS }
-  | "#|"            { PREVIOUS_CONTEXT }
-  | "#~"            { OBSOLETE_MESSAGE }
-  | [0-9]+ as n     { NUM n }
+  (* ugly *)
+  | "#." white* ([^'\n']* as content)           { EXTRACTED_COMMENT content }
+  | "#:" white* ([^'\n']* as content)           { REFERENCES content }
+  | "#," white* ([^'\n']* as content)           { FLAG content }
+  | "#|" white* ([^'\n']* as content)           { PREVIOUS_CONTEXT content }
+  | "#~" white* ([^'\n']* as content)            { OBSOLETE_MESSAGE content }
+  | '#'  white* ([^'\n']* as content)           { TRANSLATOR_COMMENT content }
+  | ['0'-'9']+ as n     { NUM (int_of_string n) }
   | '\"'([^'\"']* as content)'\"'       { STRING content }
-  | [^'\n']* as comment_content         { COMMENT comment_content }
   | white           { next_token lexbuf }
   | newline         { Lexing.new_line lexbuf; next_token lexbuf }
   | eof             { EOF }

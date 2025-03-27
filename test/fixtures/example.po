@@ -25,4 +25,7 @@ msgstr "bla" #: myprog.c:8
 
 
 msgid "And my name is %s\n"
+"but you may also call me..."
+"\n"
+"$x + 1$"
 msgstr "bla"
