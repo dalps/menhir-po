@@ -7,7 +7,6 @@
   MSGSTR              "msgstr"
   MSGCTXT             "msgctxt"
   MSGID_PLURAL        "msgid_plural"
-  COMMA               ","
   LBRACKET            "["
   RBRACKET            "]"
   EOF
@@ -16,7 +15,7 @@
   FLAG                "#,"
   EXTRACTED_COMMENT   "#."
   REFERENCES          "#:" 
-  PREVIOUS_CONTEXT  "#|"
+  PREVIOUS_CONTEXT    "#|"
   OBSOLETE_MESSAGE    "#~"
 %token <int> NUM
 %token <string> STRING
@@ -30,47 +29,39 @@ let main :=
   | ~ = list(entry); EOF; <>
 
 let entry ==
-  located(
-  | singular_entry
-  | plural_entry
-  )
+  ~ = located(
+    comments = located(comment)+;
+    msgctxt = msgctxt?;
+    msgid = msgid;
+    (msgstr, msgid_plural, msgstr_plural) = entry_data; {
+      { 
+        comments;
+        msgctxt;
+        msgid;
+        msgstr;
+        msgid_plural;
+        msgstr_plural;
+      }
+    }
+  ); <>
+
+(* What follows msgid may have two forms: 
+  - Just msgstr with the translated string;
+  - The English plural form of msgid introduced by msgid_plural,
+    followed by an array of translated strings for each plural form of the target language.
+*)
+let entry_data ==
+  | msgstr = msgstr; { Some msgstr, None, None }
+  | msgid_plural = msgid_plural;
+    msgstr_plural = msgstr_plural+; { 
+    None, Some msgid_plural, Some msgstr_plural;
+  }
 
 let msgid         == located(keyed("msgid"))
 let msgid_plural  == located(keyed("msgid_plural"))
 let msgstr        == located(keyed("msgstr"))
 let msgctxt       == located(keyed("msgctxt"))
 let msgstr_plural == located("msgstr"; "["; NUM; "]"; ss = STRING+; { String.concat "" ss }) (* TODO: check if NUM's value is valid *)
-
-let singular_entry ==
-  comments = located(comment)+;
-  msgctxt = msgctxt?;
-  msgid = msgid;
-  msgstr = msgstr; {
-    {
-      comments;
-      msgctxt;
-      msgid;
-      msgstr = Some msgstr;
-      msgid_plural = None;
-      msgstr_plural = None;
-    }
-  }
-
-let plural_entry ==
-  comments = located(comment)+;
-  msgctxt = msgctxt?;
-  msgid = msgid;
-  msgid_plural = msgid_plural;
-  msgstr_plural = msgstr_plural+; {
-    {
-      comments;
-      msgctxt;
-      msgid;
-      msgstr = None;
-      msgid_plural = Some msgid_plural;
-      msgstr_plural = Some msgstr_plural;
-    }
-  }
 
 let comment :=
   | ~ = "#";  <Translator>

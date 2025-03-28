@@ -28,8 +28,6 @@ rule next_token =
   | "msgid_plural"  { MSGID_PLURAL }
   | '['             { LBRACKET }
   | ']'             { RBRACKET }
-  | ','             { COMMA }
-  (* ugly *)
   | "#." white* ([^'\n']* as content)           { EXTRACTED_COMMENT content }
   | "#:" white* ([^'\n']* as content)           { REFERENCES content }
   | "#," white* ([^'\n']* as content)           { FLAG content }
