@@ -11,7 +11,7 @@ type comment =
 type 'a located = { range : Lexing.(position * position); value : 'a }
 (** A value annotated with start and end positions in a source file. *)
 
-type raw_entry = {
+type message = {
   (* We assume every comment corresponds to an entry *)
   is_fuzzy : bool;
   comments : comment located list;
@@ -28,12 +28,8 @@ type raw_entry = {
       forms;
     - The msgid_plural, msgstr_plural pair and msgstr are mutually exclusive. *)
 
-type entry = raw_entry located
-(** An entry with a location. *)
 
-type po_file = entry list
-
-let is_fuzzy =
-  List.exists
-    (fun cmt ->
-      match cmt.value with Flags flags -> List.mem "fuzzy" flags | _ -> false)
+type po_file = {
+  messages: message located list;
+  obsolete: comment located list;
+}

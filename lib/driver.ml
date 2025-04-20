@@ -1,6 +1,6 @@
 include Nice_parser.Make (struct
   type token = Parser.token
-  type result = Ast.entry list
+  type result = Ast.po_file
 
   exception ParseError = Parser.Error
 

@@ -26,15 +26,17 @@
 %token <int> NUM
 
 %start <po_file> main
-%type <entry> entry
+%type <message> entry
 
 %%
 
 let main :=
-  | ~ = list(entry); EOF; <>
+  | messages = located(entry)+; obsolete = located(comment)*; EOF; {{
+    messages;
+    obsolete
+  }}
 
 let entry ==
-  ~ = located(
     comments = located(comment)+;
     msgctxt = msgctxt?;
     msgid = msgid;
@@ -49,7 +51,6 @@ let entry ==
         msgstr_plurals;
       }
     }
-  ); <>
 
 (* What follows msgid may have two forms: 
   - Just msgstr with the translated string;

@@ -23,7 +23,8 @@ msgstr ""
 msgid "My name is %s\n"
 msgstr ""
 
-#: /home/dalpi/learn-gettext/myprog.c:13 #, c-format
+#: /home/dalpi/learn-gettext/myprog.c:13
+#, c-format
 msgid "There is %d bug in your code!"
 msgid_plural "There are %d bugs in your code!"
 msgstr[0] "C'è %d bug nel tuo codice!"
