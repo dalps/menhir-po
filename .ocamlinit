@@ -2,3 +2,7 @@ open Po_menhir
 open Po_menhir_test
 open Test_parser
 open Driver
+
+let c1 = parse_file "test/fixtures/example.po";;
+let c2 = parse_file "test/fixtures/messages.po";;
+let c3 = parse_file "test/fixtures/gettextpo-1.de.po";;

@@ -28,12 +28,12 @@ rule next_token =
   | "msgid_plural"  { MSGID_PLURAL }
   | '['             { LBRACKET }
   | ']'             { RBRACKET }
-  | "#." white* ([^'\n']* as content)           { EXTRACTED_COMMENT content }
+  | "#." white* ([^'\n']* as content)           { EXTRACTED content }
   | "#:" white* ([^'\n']* as content)           { REFERENCES content }
   | "#," white* ([^'\n']* as content)           { FLAG content }
   | "#|" white* ([^'\n']* as content)           { PREVIOUS_CONTEXT content }
-  | "#~" white* ([^'\n']* as content)            { OBSOLETE_MESSAGE content }
-  | '#'  white* ([^'\n']* as content)           { TRANSLATOR_COMMENT content }
+  | "#~" white* ([^'\n']* as content)            { OBSOLETE content }
+  | '#'  white* ([^'\n']* as content)           { TRANSLATOR content }
   | ['0'-'9']+ as n     { NUM (int_of_string n) }
   | '\"'([^'\"']* as content)'\"'       { STRING content }
   | white           { next_token lexbuf }

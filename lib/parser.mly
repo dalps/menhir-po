@@ -1,69 +1,63 @@
 %{
   open Ast
-
-  let is_fuzzy =
-    List.exists
-      (fun cmt ->
-        match cmt.value with Flags fs -> List.mem "fuzzy" fs | _ -> false)
 %}
 
 %token
-  MSGID               "msgid"
-  MSGSTR              "msgstr"
-  MSGCTXT             "msgctxt"
-  MSGID_PLURAL        "msgid_plural"
-  LBRACKET            "["
-  RBRACKET            "]"
+  MSGID "msgid"
+  MSGSTR "msgstr"
+  MSGCTXT "msgctxt"
+  MSGID_PLURAL "msgid_plural"
+  LBRACKET "["
+  RBRACKET "]"
   EOF
 %token <string>
   STRING
-  TRANSLATOR_COMMENT  "#"
-  FLAG                "#,"
-  EXTRACTED_COMMENT   "#."
-  REFERENCES          "#:" 
-  PREVIOUS_CONTEXT    "#|"
-  OBSOLETE_MESSAGE    "#~"
+  TRANSLATOR "#"
+  FLAG "#,"
+  EXTRACTED "#."
+  REFERENCES "#:" 
+  PREVIOUS_CONTEXT "#|"
+  OBSOLETE "#~"
 %token <int> NUM
 
-%start <po_file> main
-%type <message> entry
+%start <[ `Translation of translation | `Comments of comment located list ] list> main
+%type <translation> translation
 
 %%
 
 let main :=
-  | messages = located(entry)+; obsolete = located(comment)*; EOF; {{
-    messages;
-    obsolete
-  }}
+  | ~ = nonempty_list(
+    | ~ = comments; <`Comments>
+    | ~ = translation; <`Translation>  
+    ); EOF; <>
 
-let entry ==
-    comments = located(comment)+;
-    msgctxt = msgctxt?;
-    msgid = msgid;
-    (msgstr, msgid_plural, msgstr_plurals) = entry_data; {
-      { 
-        comments;
-        is_fuzzy = is_fuzzy comments;
-        msgctxt;
-        msgid;
-        msgstr;
-        msgid_plural;
-        msgstr_plurals;
-      }
+// A block of comments that may or may not precede translation data
+let comments == located(comment)+
+
+// Translation data
+let translation ==
+  msgctxt = msgctxt?;
+  msgid = msgid;
+  (msgstr, msgid_plural, msgstr_plurals) = entry_data; {
+    { 
+      msgctxt;
+      msgid;
+      msgstr;
+      msgid_plural;
+      msgstr_plurals;
     }
+  }
 
-(* What follows msgid may have two forms: 
-  - Just msgstr with the translated string;
-  - The English plural form of msgid introduced by msgid_plural,
-    followed by an array of translated strings for each plural 
-    form of the target language.
-*)
+// What follows msgid may have two forms: 
+//  - Just msgstr with the translated string;
+//  - The English plural form of msgid introduced by msgid_plural,
+//    followed by an array of translated strings for each plural 
+//    form of the target language.
 let entry_data ==
   | msgstr = msgstr; { Some msgstr, None, None }
-  | msgid_plural = msgid_plural;
-    msgstr_plurals = msgstr_plurals+; { 
-    None, Some msgid_plural, Some msgstr_plurals;
-  }
+  | msgid_plural = msgid_plural; msgstr_plurals = msgstr_plurals+; { 
+      None, Some msgid_plural, Some msgstr_plurals;
+    }
 
 let msgid           == located(keyed("msgid"))
 let msgid_plural    == located(keyed("msgid_plural"))
@@ -78,7 +72,7 @@ let comment :=
   | ~ = "#."; <Extracted>
   | ~ = "#:"; <Reference>
   | l = "#,"; { Flags (String.split_on_char ',' l) }
-  | ~ = "#~"; <Obsolete_message>
+  | ~ = "#~"; <Obsolete>
   | ~ = "#|"; <Previous_context>
 
 let keyed(KEY) ==

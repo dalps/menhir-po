@@ -1,6 +1,8 @@
+open Ast
+
 include Nice_parser.Make (struct
   type token = Parser.token
-  type result = Ast.po_file
+  type result = [ `Translation of Ast.translation | `Comments of comment located list ] list
 
   exception ParseError = Parser.Error
 

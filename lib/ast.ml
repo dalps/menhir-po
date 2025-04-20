@@ -3,7 +3,7 @@ type comment =
   | Extracted of string
   | Reference of string
   | Flags of string list
-  | Obsolete_message of string
+  | Obsolete of string
   | Previous_context of string
   | Previous_untranslated_string of string
   | Previous_untranslated_string_plural of string
@@ -11,10 +11,7 @@ type comment =
 type 'a located = { range : Lexing.(position * position); value : 'a }
 (** A value annotated with start and end positions in a source file. *)
 
-type message = {
-  (* We assume every comment corresponds to an entry *)
-  is_fuzzy : bool;
-  comments : comment located list;
+type translation = {
   msgid : string located;
   msgid_plural : string located option;
   msgctxt : string located option;
@@ -29,7 +26,7 @@ type message = {
     - The msgid_plural, msgstr_plural pair and msgstr are mutually exclusive. *)
 
 
-type po_file = {
-  messages: message located list;
+type po = {
+  messages: translation located list;
   obsolete: comment located list;
 }
